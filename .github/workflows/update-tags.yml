@@ -1,0 +1,41 @@
+name: Update tags
+
+on:
+  push:
+    tags:
+      - v*.*.*
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Parse semantic version from tag
+        id: semver
+        run: |
+          VERSION="$GITHUB_REF_NAME"
+          VERSION="${VERSION#[vV]}"
+          VERSION_MINOR="${VERSION#*.}"
+          echo "major=${VERSION%%\.*}" >> $GITHUB_OUTPUT
+          echo "minor=${VERSION_MINOR%.*}" >> $GITHUB_OUTPUT
+          echo "patch=${VERSION##*.}" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Tag major and minor versions
+        run: |
+          TAGS="v${VERSION_MAJOR} v${VERSION_MAJOR}.${VERSION_MINOR}"
+
+          for TAG in $TAGS; do
+            git tag -d $TAG || true
+            git push origin :$TAG || true
+            git tag $TAG
+            git push origin $TAG
+          done
+        env:
+          VERSION_MAJOR: ${{ steps.semver.outputs.major }}
+          VERSION_MINOR: ${{ steps.semver.outputs.minor }}
