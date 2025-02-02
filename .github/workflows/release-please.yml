@@ -10,6 +10,14 @@ on:
         description: 'The environment where to run workflow'
         required: false
         type: string
+      config-file:
+        required: true
+        type: string
+        default: 'release-please-config.json'
+      manifest-file:
+        required: true
+        type: string
+        default: '.release-please-manifest.json'
     secrets:
       app-private-key:
         description: 'The GitHub App private key'
@@ -31,5 +39,5 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: ${{ inputs.config-file }}
+          manifest-file: ${{ inputs.manifest-file }}
