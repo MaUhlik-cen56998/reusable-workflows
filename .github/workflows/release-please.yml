@@ -11,11 +11,11 @@ on:
         required: false
         type: string
       config-file:
-        required: true
+        required: false
         type: string
         default: 'release-please-config.json'
       manifest-file:
-        required: true
+        required: false
         type: string
         default: '.release-please-manifest.json'
     secrets:
